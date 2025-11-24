@@ -1,0 +1,1 @@
+from django.contrib import admin\nfrom .models import ServingBuilding, Address\n\nadmin.site.register(ServingBuilding)\nadmin.site.register(Address)

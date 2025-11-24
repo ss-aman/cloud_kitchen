@@ -1,0 +1,1 @@
+from django.shortcuts import render\nfrom django.contrib.admin.views.decorators import staff_member_required\n\n@staff_member_required\ndef dashboard(request):\n    return render(request, 'admin/analytics_dashboard.html')

@@ -1,0 +1,11 @@
+{% extends 'base/base.html' %}
+{% block title %}Order Successful{% endblock %}
+{% block content %}
+<div class="container" style="text-align: center; margin-top: 100px;">
+    <h1 style="color: #28a745; margin-bottom: 30px;">✓ Order Placed Successfully!</h1>
+    <div style="background: white; padding: 40px; border-radius: 10px; display: inline-block;">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="QR Code" style="width: 200px; height: 200px; border: 2px solid #ddd;">
+        <p style="margin-top: 20px;">Scan this QR code for payment</p>
+    </div>
+</div>
+{% endblock %}

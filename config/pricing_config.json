@@ -1,0 +1,23 @@
+{
+  "ingredients": {
+    "rice": {"unit": "kg", "cost_per_unit": 50.0, "serving_size": 0.2},
+    "chicken": {"unit": "kg", "cost_per_unit": 250.0, "serving_size": 0.15},
+    "vegetables": {"unit": "kg", "cost_per_unit": 40.0, "serving_size": 0.1},
+    "spices": {"unit": "kg", "cost_per_unit": 200.0, "serving_size": 0.01},
+    "oil": {"unit": "liter", "cost_per_unit": 150.0, "serving_size": 0.02}
+  },
+  "recipes": {
+    "chicken_biryani": {
+      "ingredients": [
+        {"name": "rice", "quantity": 1},
+        {"name": "chicken", "quantity": 1},
+        {"name": "vegetables", "quantity": 0.5},
+        {"name": "spices", "quantity": 1},
+        {"name": "oil", "quantity": 1}
+      ],
+      "labor_cost": 20.0,
+      "overhead_cost": 15.0,
+      "profit_margin_percentage": 40.0
+    }
+  }
+}

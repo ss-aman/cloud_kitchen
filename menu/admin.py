@@ -1,0 +1,1 @@
+from django.contrib import admin\nfrom .models import MenuItem\n\n@admin.register(MenuItem)\nclass MenuItemAdmin(admin.ModelAdmin):\n    list_display = ['name', 'price', 'is_active']\n    list_filter = ['is_active']

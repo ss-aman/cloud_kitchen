@@ -1,0 +1,1 @@
+from django.contrib import admin\nfrom .models import Order, OrderItem\n\nadmin.site.register(Order)\nadmin.site.register(OrderItem)

@@ -1,0 +1,1 @@
+from django.contrib import admin\nfrom .models import Referral\n\nadmin.site.register(Referral)

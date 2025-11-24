@@ -1,0 +1,1 @@
+from django.contrib import admin\nfrom .models import CoinWallet\n\nadmin.site.register(CoinWallet)

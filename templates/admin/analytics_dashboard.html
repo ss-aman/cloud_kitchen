@@ -1,0 +1,18 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<h1>Analytics Dashboard</h1>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Total Orders</h3>
+        <p style="font-size: 2em; font-weight: bold;">0</p>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Revenue</h3>
+        <p style="font-size: 2em; font-weight: bold;">₹0</p>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Active Users</h3>
+        <p style="font-size: 2em; font-weight: bold;">0</p>
+    </div>
+</div>
+{% endblock %}

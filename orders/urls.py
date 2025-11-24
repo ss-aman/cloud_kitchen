@@ -1,0 +1,1 @@
+from django.urls import path\nfrom . import views\n\nurlpatterns = [\n    path('', views.order_page, name='order_page'),\n    path('history/', views.order_history, name='order_history'),\n    path('success/<int:order_id>/', views.order_success, name='order_success'),\n]
