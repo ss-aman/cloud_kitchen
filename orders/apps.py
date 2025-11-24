@@ -1,1 +1,5 @@
-from django.apps import AppConfig\n\nclass OrdersConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'orders'
+from django.apps import AppConfig
+
+class OrdersConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'orders'

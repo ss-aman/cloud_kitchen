@@ -1,1 +1,5 @@
-from django.apps import AppConfig\n\nclass ExpensesConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'expenses'
+from django.apps import AppConfig
+
+class ExpensesConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'expenses'

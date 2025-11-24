@@ -1,1 +1,5 @@
-from django.contrib import admin\nfrom .models import Expense, ExpenseType\n\nadmin.site.register(Expense)\nadmin.site.register(ExpenseType)
+from django.contrib import admin
+from .models import Expense, ExpenseType
+
+admin.site.register(Expense)
+admin.site.register(ExpenseType)

@@ -1,1 +1,6 @@
-from django.urls import path\nfrom . import views\n\nurlpatterns = [\n    path('dashboard/', views.dashboard, name='analytics_dashboard'),\n]
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('dashboard/', views.dashboard, name='analytics_dashboard'),
+]

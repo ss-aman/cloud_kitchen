@@ -1,1 +1,5 @@
-from django.apps import AppConfig\n\nclass WalletConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'wallet'
+from django.apps import AppConfig
+
+class WalletConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'wallet'

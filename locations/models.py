@@ -14,7 +14,7 @@ class ServingBuilding(models.Model):
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
-    serving_building = models.ForeignKey(ServingBuilding, on_delete=models.CASCADE)
+    serving_building = models.ForeignKey(ServingBuilding, on_delete=models.CASCADE, related_name='resident_addresses')
     flat_number = models.CharField(max_length=50)
     landmark = models.CharField(max_length=200, blank=True)
     is_default = models.BooleanField(default=False)

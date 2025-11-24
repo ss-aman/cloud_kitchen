@@ -1,1 +1,4 @@
-from django.contrib import admin\nfrom .models import Referral\n\nadmin.site.register(Referral)
+from django.contrib import admin
+from .models import Referral
+
+admin.site.register(Referral)

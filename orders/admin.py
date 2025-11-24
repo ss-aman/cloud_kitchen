@@ -1,1 +1,5 @@
-from django.contrib import admin\nfrom .models import Order, OrderItem\n\nadmin.site.register(Order)\nadmin.site.register(OrderItem)
+from django.contrib import admin
+from .models import Order, OrderItem
+
+admin.site.register(Order)
+admin.site.register(OrderItem)

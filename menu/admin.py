@@ -1,1 +1,7 @@
-from django.contrib import admin\nfrom .models import MenuItem\n\n@admin.register(MenuItem)\nclass MenuItemAdmin(admin.ModelAdmin):\n    list_display = ['name', 'price', 'is_active']\n    list_filter = ['is_active']
+from django.contrib import admin
+from .models import MenuItem
+
+@admin.register(MenuItem)
+class MenuItemAdmin(admin.ModelAdmin):
+    list_display = ['name', 'price', 'is_active']
+    list_filter = ['is_active']

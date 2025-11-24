@@ -1,1 +1,5 @@
-from django.contrib import admin\nfrom .models import ServingBuilding, Address\n\nadmin.site.register(ServingBuilding)\nadmin.site.register(Address)
+from django.contrib import admin
+from .models import ServingBuilding, Address
+
+admin.site.register(ServingBuilding)
+admin.site.register(Address)

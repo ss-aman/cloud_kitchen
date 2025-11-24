@@ -1,1 +1,5 @@
-from django.apps import AppConfig\n\nclass LocationsConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'locations'
+from django.apps import AppConfig
+
+class LocationsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'locations'

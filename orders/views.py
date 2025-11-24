@@ -1,1 +1,14 @@
-from django.shortcuts import render\nfrom django.contrib.auth.decorators import login_required\n\n@login_required\ndef order_page(request):\n    return render(request, 'orders/order_page.html')\n\n@login_required\ndef order_history(request):\n    return render(request, 'orders/order_history.html')\n\n@login_required\ndef order_success(request, order_id):\n    return render(request, 'orders/order_success.html')
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def order_page(request):
+    return render(request, 'orders/order_page.html')
+
+@login_required
+def order_history(request):
+    return render(request, 'orders/order_history.html')
+
+@login_required
+def order_success(request, order_id):
+    return render(request, 'orders/order_success.html')

@@ -1,1 +1,5 @@
-from django.apps import AppConfig\n\nclass DeliveryConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'delivery'
+from django.apps import AppConfig
+
+class DeliveryConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'delivery'

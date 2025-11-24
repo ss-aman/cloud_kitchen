@@ -1,1 +1,4 @@
-from django.contrib import admin\nfrom .models import CoinWallet\n\nadmin.site.register(CoinWallet)
+from django.contrib import admin
+from .models import CoinWallet
+
+admin.site.register(CoinWallet)
