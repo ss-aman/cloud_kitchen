@@ -19,6 +19,39 @@
         </div>
     </div>
 
+    <!-- Address Section -->
+    <div
+        style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 18px;">Delivery Address</h3>
+            <button onclick="showAddressModal()" class="btn"
+                style="background: #007bff; padding: 8px 15px; font-size: 0.9em;">
+                {% if default_address %}Change Address{% else %}Add Address{% endif %}
+            </button>
+        </div>
+
+        {% if default_address %}
+        <div id="selected-address-display"
+            style="padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+            <div style="font-weight: bold; color: #333; margin-bottom: 5px;">{{ default_address.serving_building.name }}
+            </div>
+            <div style="color: #666; font-size: 0.9em;">Flat: {{ default_address.flat_number }}</div>
+            {% if default_address.landmark %}
+            <div style="color: #666; font-size: 0.9em;">Landmark: {{ default_address.landmark }}</div>
+            {% endif %}
+            <div style="color: #999; font-size: 0.85em; margin-top: 5px;">{{ default_address.serving_building.address }}
+            </div>
+        </div>
+        <input type="hidden" id="selected-address-id" value="{{ default_address.id }}">
+        {% else %}
+        <div id="selected-address-display"
+            style="padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <div style="color: #856404;">⚠️ No delivery address set. Please add an address to place orders.</div>
+        </div>
+        <input type="hidden" id="selected-address-id" value="">
+        {% endif %}
+    </div>
+
     <!-- Menu Grid -->
     <div
         style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-bottom: 80px;">
@@ -71,8 +104,98 @@
     </div>
 </div>
 
+<!-- Address Modal -->
+<div id="addressModal"
+    style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+    <div
+        style="background: white; border-radius: 15px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Select or Add Address</h2>
+            <button onclick="closeAddressModal()"
+                style="border: none; background: none; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+
+        <!-- Existing Addresses -->
+        <div id="addresses-list" style="margin-bottom: 20px;">
+            {% for address in all_addresses %}
+            <div class="address-item" data-address-id="{{ address.id }}" onclick="selectAddress({{ address.id }})"
+                style="padding: 15px; background: {% if address.is_default %}#e7f5ff{% else %}#f8f9fa{% endif %}; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border: 2px solid {% if address.is_default %}#007bff{% else %}transparent{% endif %};">
+                <div style="font-weight: bold; color: #333;">{{ address.serving_building.name }}</div>
+                <div style="color: #666; font-size: 0.9em;">Flat: {{ address.flat_number }}</div>
+                {% if address.landmark %}
+                <div style="color: #666; font-size: 0.9em;">Landmark: {{ address.landmark }}</div>
+                {% endif %}
+                {% if address.is_default %}
+                <div style="color: #007bff; font-size: 0.85em; margin-top: 5px;">✓ Default Address</div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div style="padding: 20px; text-align: center; color: #666;">No addresses saved yet.</div>
+            {% endfor %}
+        </div>
+
+        <!-- Add New Address Form -->
+        <div style="border-top: 2px solid #eee; padding-top: 20px;">
+            <h3 style="margin-bottom: 15px;">Add New Address</h3>
+            <form id="addAddressForm" onsubmit="addNewAddress(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Building *</label>
+                    <select id="building-select" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Select Building</option>
+                        {% for building in buildings %}
+                        <option value="{{ building.id }}">{{ building.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Flat Number *</label>
+                    <input type="text" id="flat-number" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Landmark (Optional)</label>
+                    <input type="text" id="landmark"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="set-default" style="margin-right: 8px;">
+                        <span>Set as default address</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; background: #28a745; padding: 12px;">Add
+                    Address</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Phone Modal -->
+<div id="phoneModal"
+    style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 15px; padding: 30px; max-width: 400px; width: 90%;">
+        <h2 style="margin-bottom: 20px;">Phone Number Required</h2>
+        <p style="color: #666; margin-bottom: 20px;">Please provide your phone number to complete the order.</p>
+        <form id="phoneForm" onsubmit="updatePhone(event)">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number *</label>
+                <input type="tel" id="phone-input" required pattern="[0-9]{10,15}"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                    placeholder="Enter 10-15 digit phone number">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" onclick="closePhoneModal()" class="btn"
+                    style="flex: 1; background: #6c757d;">Cancel</button>
+                <button type="submit" class="btn" style="flex: 1; background: #007bff;">Save & Continue</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     let cart = {};
+    let pendingOrderData = null;
 
     function updateUI(itemId) {
         const controlDiv = document.getElementById(`item-control-${itemId}`);
@@ -123,17 +246,30 @@
     function placeOrder() {
         if (Object.keys(cart).length === 0) return;
 
+        const addressId = document.getElementById('selected-address-id').value;
+
         fetch('{% url "place_order" %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
-            body: JSON.stringify({ items: cart })
+            body: JSON.stringify({
+                items: cart,
+                address_id: addressId || null
+            })
         })
             .then(response => response.json())
             .then(data => {
-                if (data.redirect_url) {
+                if (data.validation_error) {
+                    // Handle validation errors
+                    if (data.missing_field === 'phone') {
+                        showPhoneModal();
+                    } else if (data.missing_field === 'address') {
+                        alert('Please add a delivery address first.');
+                        showAddressModal();
+                    }
+                } else if (data.redirect_url) {
                     window.location.href = data.redirect_url;
                 } else {
                     alert('Error placing order: ' + (data.error || 'Unknown error'));
@@ -142,6 +278,110 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error placing order');
+            });
+    }
+
+    function showAddressModal() {
+        document.getElementById('addressModal').style.display = 'flex';
+    }
+
+    function closeAddressModal() {
+        document.getElementById('addressModal').style.display = 'none';
+    }
+
+    function selectAddress(addressId) {
+        // Set as default and update display
+        fetch(`/locations/addresses/set-default/${addressId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload page to update address display
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating address');
+            });
+    }
+
+    function addNewAddress(event) {
+        event.preventDefault();
+
+        const buildingId = document.getElementById('building-select').value;
+        const flatNumber = document.getElementById('flat-number').value;
+        const landmark = document.getElementById('landmark').value;
+        const isDefault = document.getElementById('set-default').checked;
+
+        fetch('{% url "add_address" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                building_id: buildingId,
+                flat_number: flatNumber,
+                landmark: landmark,
+                is_default: isDefault
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Address added successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding address');
+            });
+    }
+
+    function showPhoneModal() {
+        document.getElementById('phoneModal').style.display = 'flex';
+    }
+
+    function closePhoneModal() {
+        document.getElementById('phoneModal').style.display = 'none';
+    }
+
+    function updatePhone(event) {
+        event.preventDefault();
+
+        const phoneNumber = document.getElementById('phone-input').value;
+
+        fetch('{% url "update_phone" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                phone_number: phoneNumber
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closePhoneModal();
+                    // Retry placing order
+                    placeOrder();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating phone number');
             });
     }
 
@@ -157,5 +397,6 @@
                 alert('Error getting referral link');
             });
     }
+
 </script>
 {% endblock %}

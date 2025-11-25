@@ -17,10 +17,19 @@ def order_page(request):
         balance = wallet.balance
     except CoinWallet.DoesNotExist:
         balance = 0
+    
+    # Get user's default address
+    from locations.models import Address, ServingBuilding
+    default_address = Address.objects.filter(user=request.user, is_default=True).select_related('serving_building').first()
+    all_addresses = Address.objects.filter(user=request.user).select_related('serving_building')
+    buildings = ServingBuilding.objects.filter(is_active=True)
         
     context = {
         'menu_items': menu_items,
-        'wallet_balance': balance
+        'wallet_balance': balance,
+        'default_address': default_address,
+        'all_addresses': all_addresses,
+        'buildings': buildings,
     }
     return render(request, 'orders/order_page.html', context)
 
@@ -30,13 +39,39 @@ def place_order(request):
         try:
             data = json.loads(request.body)
             cart_items = data.get('items', {})
+            address_id = data.get('address_id')  # Get selected address
             
             if not cart_items:
                 return JsonResponse({'error': 'Cart is empty'}, status=400)
             
+            # Validate user has phone number
+            if not request.user.phone_number:
+                return JsonResponse({
+                    'error': 'Phone number required',
+                    'validation_error': True,
+                    'missing_field': 'phone'
+                }, status=400)
+            
+            # Validate user has a delivery address
+            from locations.models import Address
+            
+            # If address_id provided, use it; otherwise use default
+            if address_id:
+                delivery_address = Address.objects.filter(id=address_id, user=request.user).first()
+            else:
+                delivery_address = Address.objects.filter(user=request.user, is_default=True).first()
+            
+            if not delivery_address:
+                return JsonResponse({
+                    'error': 'Delivery address required',
+                    'validation_error': True,
+                    'missing_field': 'address'
+                }, status=400)
+            
             # Create Order
             order = Order.objects.create(
                 user=request.user,
+                address=delivery_address,
                 total_amount=0, # Will update later
                 status='pending'
             )

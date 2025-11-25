@@ -77,3 +77,34 @@ def signup_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def update_phone(request):
+    """Update user phone number"""
+    if request.method == 'POST':
+        from django.http import JsonResponse
+        import json
+        
+        try:
+            data = json.loads(request.body)
+            phone_number = data.get('phone_number', '').strip()
+            
+            if not phone_number:
+                return JsonResponse({'error': 'Phone number is required'}, status=400)
+            
+            # Check if phone number already exists for another user
+            if User.objects.filter(phone_number=phone_number).exclude(id=request.user.id).exists():
+                return JsonResponse({'error': 'Phone number already in use'}, status=400)
+            
+            request.user.phone_number = phone_number
+            request.user.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Phone number updated successfully'
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
