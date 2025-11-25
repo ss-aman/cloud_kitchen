@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% block title %}My Referrals{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 900px; margin-top: 30px;">
+    <h1 style="margin-bottom: 30px;">My Referrals</h1>
+
+    <div style="margin-bottom: 30px;">
+        <a href="{% url 'generate_referral' %}" class="btn" style="background: #28a745;">Generate New Referral Code</a>
+    </div>
+
+    {% if referral_data %}
+    {% for item in referral_data %}
+    <div
+        style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+            <div>
+                <h3 style="margin: 0 0 10px 0; color: #333;">{{ item.referral.code }}</h3>
+                {% if item.referral.description %}
+                <p style="color: #666; margin: 0;">{{ item.referral.description }}</p>
+                {% endif %}
+            </div>
+            <div style="text-align: right;">
+                {% if item.referral.is_active %}
+                <span
+                    style="background: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.9em;">Active</span>
+                {% else %}
+                <span
+                    style="background: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.9em;">Inactive</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <p style="margin: 0 0 5px 0; font-size: 0.9em; color: #666;">Referral Link:</p>
+            <input type="text" value="{{ item.url }}" readonly onclick="this.select()"
+                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-family: monospace;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
+            <div style="text-align: center;">
+                <p style="margin: 0; font-size: 0.9em; color: #666;">Uses</p>
+                <p style="margin: 5px 0 0 0; font-size: 1.5em; font-weight: bold; color: #007bff;">{{
+                    item.referral.uses_count }}</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="margin: 0; font-size: 0.9em; color: #666;">Max Uses</p>
+                <p style="margin: 5px 0 0 0; font-size: 1.5em; font-weight: bold; color: #007bff;">{% if
+                    item.referral.max_uses == 0 %}∞{% else %}{{ item.referral.max_uses }}{% endif %}</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="margin: 0; font-size: 0.9em; color: #666;">Expires</p>
+                <p style="margin: 5px 0 0 0; font-size: 1.5em; font-weight: bold; color: #007bff;">{% if
+                    item.referral.expires_at %}{{ item.referral.expires_at|date:"M d, Y" }}{% else %}Never{% endif %}
+                </p>
+            </div>
+        </div>
+
+        {% if item.used_by %}
+        <div style="border-top: 1px solid #eee; padding-top: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: #333;">Referred Users ({{ item.used_by|length }})</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                {% for use in item.used_by %}
+                <span style="background: #e9ecef; padding: 5px 12px; border-radius: 15px; font-size: 0.9em;">
+                    {{ use.referred_user.username }} <span style="color: #666;">({{ use.created_at|date:"M d" }})</span>
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
+        <p style="color: #666; font-size: 1.1em;">You haven't created any referral codes yet.</p>
+        <a href="{% url 'generate_referral' %}" class="btn" style="background: #28a745; margin-top: 20px;">Create Your
+            First Referral</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

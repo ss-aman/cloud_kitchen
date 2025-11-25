@@ -9,6 +9,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('menu/', include('menu.urls')),
     path('wallet/', include('wallet.urls')),
+    path('referrals/', include('referrals.urls')),
     path('analytics/', include('analytics.urls')),
 ]
 

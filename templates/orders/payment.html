@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+{% block title %}Payment - Order #{{ order.public_id }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <div
+        style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center;">
+        <h1 style="margin-bottom: 20px; color: #333;">Payment Required</h1>
+
+        <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <p style="font-size: 1.2em; color: #666; margin-bottom: 10px;">Order ID</p>
+            <h2 style="font-size: 2.5em; color: #007bff; margin: 0;">#{{ order.public_id }}</h2>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <p style="font-size: 1.2em; color: #666;">Total Amount</p>
+            <h2 style="color: #28a745;">${{ order.total_amount }}</h2>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            {% if qr_code %}
+            <div style="border: 2px solid #eee; display: inline-block; padding: 10px; border-radius: 10px;">
+                <img src="{{ qr_code.image.url }}" alt="Payment QR Code"
+                    style="width: 250px; height: 250px; object-fit: contain;">
+            </div>
+            {% else %}
+            <div style="padding: 40px; background: #eee; border-radius: 10px; color: #666;">
+                No QR Code Available
+            </div>
+            {% endif %}
+        </div>
+
+        <div
+            style="text-align: left; background: #fff3cd; padding: 20px; border-radius: 10px; border-left: 5px solid #ffc107;">
+            <h4 style="margin-bottom: 10px; color: #856404;">Important Instruction:</h4>
+            <p style="color: #856404; margin: 0;">
+                Please use the Order ID <strong>#{{ order.public_id }}</strong> in the payment description/note field.
+                This is required for us to confirm your order.
+            </p>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="{% url 'order_page' %}" class="btn" style="background: #6c757d;">Back to Menu</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

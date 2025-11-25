@@ -14,6 +14,15 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% if messages %}
+    <div class="container" style="padding-bottom: 0;">
+        {% for message in messages %}
+        <div style="padding: 10px; margin-bottom: 10px; border-radius: 5px; {% if message.tags == 'error' %}background: #f8d7da; color: #721c24;{% else %}background: #d4edda; color: #155724;{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% block content %}{% endblock %}
     {% block extra_js %}{% endblock %}
 </body>

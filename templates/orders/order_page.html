@@ -2,9 +2,160 @@
 {% block title %}Order Page{% endblock %}
 {% block content %}
 <div class="container">
-    <h1 style="margin-bottom: 30px;">Menu Items</h1>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
-        <!-- Menu items will be loaded here -->
+    <!-- Header Section with Wallet and Links -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <div>
+            <h1 style="margin: 0; font-size: 24px;">Menu</h1>
+        </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="background: #f8f9fa; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: #333;">
+                Wallet: ${{ wallet_balance }}
+            </div>
+            <a href="{% url 'order_history' %}" style="text-decoration: none; color: #007bff;">History</a>
+            <a href="#" onclick="getReferralLink(); return false;" style="text-decoration: none; color: #007bff;">Refer
+                a Friend</a>
+            <a href="{% url 'my_referrals' %}" style="text-decoration: none; color: #007bff;">My Referrals</a>
+        </div>
+    </div>
+
+    <!-- Menu Grid -->
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-bottom: 80px;">
+        {% for item in menu_items %}
+        <div
+            style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s;">
+            <div style="height: 200px; background: #eee; position: relative;">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">
+                    No Image Available
+                </div>
+                {% endif %}
+                <div
+                    style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 20px; font-weight: bold; color: #333;">
+                    ${{ item.price }}
+                </div>
+            </div>
+            <div style="padding: 20px;">
+                <h3 style="margin-bottom: 10px; color: #333;">{{ item.name }}</h3>
+                <p style="color: #666; font-size: 0.9em; margin-bottom: 20px; line-height: 1.5;">{{
+                    item.description|truncatewords:20 }}</p>
+
+                <!-- Add to Cart / Quantity Controls -->
+                <div id="item-control-{{ item.id }}" class="item-control">
+                    <button onclick="addToCart({{ item.id }})" class="btn" style="width: 100%; background: #28a745;">Add
+                        to Cart</button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+            <h3>No menu items available at the moment.</h3>
+        </div>
+        {% endfor %}
     </div>
 </div>
+
+<!-- Floating Place Order Bar -->
+<div id="place-order-bar"
+    style="position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: none; justify-content: space-between; align-items: center; z-index: 1000;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div>
+            <span style="font-weight: bold; font-size: 1.2em;">Total Items: <span id="total-items">0</span></span>
+        </div>
+        <button onclick="placeOrder()" class="btn"
+            style="background: #007bff; padding: 12px 30px; font-size: 1.1em;">Place Order</button>
+    </div>
+</div>
+
+<script>
+    let cart = {};
+
+    function updateUI(itemId) {
+        const controlDiv = document.getElementById(`item-control-${itemId}`);
+        const quantity = cart[itemId] || 0;
+
+        if (quantity === 0) {
+            controlDiv.innerHTML = `<button onclick="addToCart(${itemId})" class="btn" style="width: 100%; background: #28a745;">Add to Cart</button>`;
+        } else {
+            controlDiv.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; border-radius: 5px; padding: 5px;">
+                    <button onclick="updateQuantity(${itemId}, -1)" style="width: 30px; height: 30px; border: none; background: #dc3545; color: white; border-radius: 50%; cursor: pointer;">-</button>
+                    <span style="font-weight: bold;">${quantity}</span>
+                    <button onclick="updateQuantity(${itemId}, 1)" style="width: 30px; height: 30px; border: none; background: #28a745; color: white; border-radius: 50%; cursor: pointer;">+</button>
+                </div>
+            `;
+        }
+
+        updateFloatingBar();
+    }
+
+    function addToCart(itemId) {
+        cart[itemId] = 1;
+        updateUI(itemId);
+    }
+
+    function updateQuantity(itemId, change) {
+        if (!cart[itemId]) cart[itemId] = 0;
+        cart[itemId] += change;
+        if (cart[itemId] <= 0) {
+            delete cart[itemId];
+        }
+        updateUI(itemId);
+    }
+
+    function updateFloatingBar() {
+        const bar = document.getElementById('place-order-bar');
+        const totalItemsSpan = document.getElementById('total-items');
+        const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+
+        if (totalCount > 0) {
+            bar.style.display = 'flex';
+            totalItemsSpan.innerText = totalCount;
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
+    function placeOrder() {
+        if (Object.keys(cart).length === 0) return;
+
+        fetch('{% url "place_order" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ items: cart })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert('Error placing order: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error placing order');
+            });
+    }
+
+    function getReferralLink() {
+        fetch('{% url "get_referral_link" %}')
+            .then(response => response.json())
+            .then(data => {
+                const message = `Your Referral Link:\n\n${data.url}\n\nReferral Code: ${data.code}\nTotal Uses: ${data.uses}\n\nShare this link with friends to invite them!`;
+                prompt('Copy your referral link:', data.url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error getting referral link');
+            });
+    }
+</script>
 {% endblock %}
