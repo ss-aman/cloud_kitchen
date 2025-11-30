@@ -49,18 +49,49 @@ def signup_view(request):
         user = User.objects.create_user(username=username, email=email, password=password)
         
         # Handle referral code if provided
+        # Handle referral code if provided
         if ref_code:
             from referrals.models import Referral, ReferralUse
+            from wallet.models import WalletCredit
+            from django.conf import settings
+            
             try:
                 referral = Referral.objects.get(code=ref_code.upper())
                 if referral.is_valid():
-                    ReferralUse.objects.create(
+                    # Create ReferralUse record
+                    referral_use = ReferralUse.objects.create(
                         referral=referral,
                         referred_user=user
                     )
+                    
                     referral.uses_count += 1
                     referral.save()
-                    messages.success(request, f'Account created! You were referred by {referral.referrer.username}.')
+                    
+                    # 1. Credit Referee (New User) - Signup Bonus
+                    # This credit is INACTIVE until verification
+                    referee_credit = user.wallet.add_credit(
+                        amount=referral.referee_reward_amount,
+                        source='REFERRAL_SIGNUP',
+                        description=f'Signup bonus via {referral.referrer.username}',
+                        expires_in_days=referral.reward_expiry_days,
+                        is_active=False # Inactive until verified
+                    )
+                    referral_use.referee_credit = referee_credit
+                    
+                    # 2. Credit Referrer - Referrer Bonus
+                    # This credit is INACTIVE until referee completes orders
+                    referrer_credit = referral.referrer.wallet.add_credit(
+                        amount=referral.referrer_reward_amount,
+                        source='REFERRAL_REWARD',
+                        description=f'Referral bonus for {user.username}',
+                        expires_in_days=referral.reward_expiry_days,
+                        is_active=False # Inactive until conditions met
+                    )
+                    referral_use.referrer_credit = referrer_credit
+                    
+                    referral_use.save()
+                    
+                    messages.success(request, f'Account created! You were referred by {referral.referrer.username}. Bonus credits added to your wallet (pending verification).')
                 else:
                     messages.warning(request, 'Referral code is no longer valid, but account created successfully.')
             except Referral.DoesNotExist:

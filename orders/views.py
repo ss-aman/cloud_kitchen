@@ -8,6 +8,7 @@ import random
 from menu.models import MenuItem
 from .models import Order, OrderItem, PaymentQRCode
 from wallet.models import CoinWallet
+from delivery.services import DeliveryService
 
 @login_required
 def order_page(request):
@@ -126,3 +127,63 @@ def order_history(request):
 @login_required
 def order_success(request, order_id):
     return render(request, 'orders/order_success.html')
+
+@login_required
+def current_orders(request):
+    """Display orders placed in the last 36 hours"""
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    cutoff_time = timezone.now() - timedelta(hours=36)
+    
+    orders = Order.objects.filter(
+        user=request.user,
+        created_at__gte=cutoff_time
+    ).order_by('-created_at')
+    
+    return render(request, 'orders/current_orders.html', {'orders': orders})
+
+@login_required
+def confirm_payment(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        
+        # In a real app, verify payment here
+        order.status = 'confirmed'
+        order.save()
+        
+        # Trigger delivery
+        service = DeliveryService()
+        try:
+            service.create_delivery(order)
+        except Exception as e:
+            # Log error but don't fail the request? Or fail?
+            print(f"Failed to create delivery: {e}")
+            
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def track_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    data = {
+        'order_status': order.status,
+        'delivery': None
+    }
+    
+    if hasattr(order, 'delivery'):
+        # Update status from provider
+        service = DeliveryService()
+        service.update_delivery_status(order.delivery)
+        
+        delivery = order.delivery
+        data['delivery'] = {
+            'status': delivery.status,
+            'tracking_id': delivery.tracking_id,
+            'estimated_time': delivery.estimated_delivery_time,
+            'driver_name': delivery.driver_name,
+            'driver_phone': delivery.driver_phone,
+        }
+        
+    return JsonResponse(data)

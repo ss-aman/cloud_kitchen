@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Wallet</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Active Balance</h5>
+                    <h2 class="card-text">{{ active_balance }} Coins</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Balance</h5>
+                    <h2 class="card-text">{{ inactive_balance }} Coins</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Credit History</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Source</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Expires At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for credit in credits %}
+                <tr>
+                    <td>{{ credit.created_at|date:"M d, Y" }}</td>
+                    <td>{{ credit.amount }}</td>
+                    <td>{{ credit.get_source_display }}</td>
+                    <td>{{ credit.description }}</td>
+                    <td>
+                        {% if credit.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-warning">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ credit.expires_at|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No transactions yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

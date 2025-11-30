@@ -1,0 +1,257 @@
+{% extends 'base/base.html' %}
+{% block title %}Give Feedback{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <div class="feedback-container"
+        style="background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+        <h2 class="text-center mb-4" style="color: #2c3e50; font-weight: 700;">
+            <i class="fas fa-comment-dots" style="color: #3498db;"></i> Share Your Feedback
+        </h2>
+
+        <!-- Feedback Type Selector -->
+        <div class="feedback-types mb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="type-card {% if feedback_type == 'delivery' %}active{% endif %}" data-type="delivery">
+                        <i class="fas fa-shipping-fast"></i>
+                        <span>Delivery</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="type-card {% if feedback_type == 'order' %}active{% endif %}" data-type="order">
+                        <i class="fas fa-utensils"></i>
+                        <span>Order</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="type-card {% if feedback_type == 'idea' %}active{% endif %}" data-type="idea">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Idea</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="type-card {% if feedback_type == 'tip' %}active{% endif %}" data-type="tip">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Tip</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Form -->
+        <form id="feedbackForm">
+            {% csrf_token %}
+            <input type="hidden" name="feedback_type" id="feedbackType" value="{{ feedback_type }}">
+            <input type="hidden" name="order_id" value="{{ order_id }}">
+
+            <!-- Rating Section (for delivery/order) -->
+            <div id="ratingSection" class="mb-4"
+                style="{% if feedback_type not in 'delivery,order' %}display:none;{% endif %}">
+                <label class="form-label fw-bold" style="color: #2c3e50;">Rate Your Experience</label>
+                <div class="star-rating">
+                    <i class="fas fa-star" data-rating="1"></i>
+                    <i class="fas fa-star" data-rating="2"></i>
+                    <i class="fas fa-star" data-rating="3"></i>
+                    <i class="fas fa-star" data-rating="4"></i>
+                    <i class="fas fa-star" data-rating="5"></i>
+                </div>
+                <input type="hidden" name="rating" id="ratingValue">
+                <small class="text-muted" id="ratingText"></small>
+            </div>
+
+            <!-- Subject -->
+            <div class="mb-4">
+                <label class="form-label fw-bold" style="color: #2c3e50;">Subject</label>
+                <input type="text" class="form-control form-control-lg" name="subject" required
+                    placeholder="Brief summary of your feedback"
+                    style="border-radius: 10px; border: 2px solid #e0e0e0;">
+            </div>
+
+            <!-- Message -->
+            <div class="mb-4">
+                <label class="form-label fw-bold" style="color: #2c3e50;">Your Feedback</label>
+                <textarea class="form-control form-control-lg" name="message" rows="5" required
+                    placeholder="Tell us more about your experience..."
+                    style="border-radius: 10px; border: 2px solid #e0e0e0;"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-lg px-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                               border: none; border-radius: 50px; color: white; font-weight: 600;
+                               box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                    <i class="fas fa-paper-plane me-2"></i> Submit Feedback
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .type-card {
+        background: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 20px 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .type-card.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+    }
+
+    .type-card i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .type-card span {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .star-rating {
+        font-size: 2.5rem;
+        color: #ddd;
+        cursor: pointer;
+        margin: 10px 0;
+    }
+
+    .star-rating i {
+        transition: all 0.2s ease;
+        margin: 0 5px;
+    }
+
+    .star-rating i:hover,
+    .star-rating i.active {
+        color: #ffd700;
+        transform: scale(1.2);
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeCards = document.querySelectorAll('.type-card');
+        const feedbackTypeInput = document.getElementById('feedbackType');
+        const ratingSection = document.getElementById('ratingSection');
+        const stars = document.querySelectorAll('.star-rating i');
+        const ratingValue = document.getElementById('ratingValue');
+        const ratingText = document.getElementById('ratingText');
+
+        const ratingTexts = {
+            1: 'Poor',
+            2: 'Fair',
+            3: 'Good',
+            4: 'Very Good',
+            5: 'Excellent'
+        };
+
+        // Type card selection
+        typeCards.forEach(card => {
+            card.addEventListener('click', function () {
+                typeCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const type = this.dataset.type;
+                feedbackTypeInput.value = type;
+
+                // Show/hide rating based on type
+                if (type === 'delivery' || type === 'order') {
+                    ratingSection.style.display = 'block';
+                } else {
+                    ratingSection.style.display = 'none';
+                    ratingValue.value = '';
+                }
+            });
+        });
+
+        // Star rating
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                const rating = this.dataset.rating;
+                ratingValue.value = rating;
+                ratingText.textContent = ratingTexts[rating];
+
+                stars.forEach((s, index) => {
+                    if (index < rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseenter', function () {
+                const rating = this.dataset.rating;
+                stars.forEach((s, index) => {
+                    if (index < rating) {
+                        s.style.color = '#ffd700';
+                    } else {
+                        s.style.color = '#ddd';
+                    }
+                });
+            });
+        });
+
+        document.querySelector('.star-rating').addEventListener('mouseleave', function () {
+            const currentRating = ratingValue.value;
+            stars.forEach((s, index) => {
+                if (index < currentRating) {
+                    s.style.color = '#ffd700';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const type = feedbackTypeInput.value;
+
+            // Validate rating for delivery/order
+            if ((type === 'delivery' || type === 'order') && !ratingValue.value) {
+                alert('Please provide a rating');
+                return;
+            }
+
+            fetch('/feedback/submit/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = '/feedback/success/';
+                    } else {
+                        alert(data.error || 'An error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting feedback');
+                });
+        });
+    });
+</script>
+{% endblock %}

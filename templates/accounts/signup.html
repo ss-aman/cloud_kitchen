@@ -5,6 +5,13 @@
     <h2 style="text-align: center; margin-bottom: 30px;">Sign Up</h2>
     <form method="post"
         style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        {% if referral_code %}
+        <div
+            style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+            <strong>Special Offer!</strong> Sign up with code <strong>{{ referral_code }}</strong> to get <strong>50
+                coins</strong> bonus!
+        </div>
+        {% endif %}
         {% csrf_token %}
         <div style="margin-bottom: 20px;">
             <label>Username:</label>

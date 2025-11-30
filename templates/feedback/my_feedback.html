@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+{% block title %}My Feedback{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #2c3e50; font-weight: 700;">
+            <i class="fas fa-comments"></i> My Feedback
+        </h2>
+        <a href="{% url 'feedback_form' %}" class="btn btn-primary" style="border-radius: 50px;">
+            <i class="fas fa-plus me-2"></i> New Feedback
+        </a>
+    </div>
+
+    {% if feedbacks %}
+    <div class="row">
+        {% for feedback in feedbacks %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm" style="border-radius: 15px; border: none;">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
+                    <span class="badge bg-light text-dark">{{ feedback.get_feedback_type_display }}</span>
+                    <small>{{ feedback.created_at|date:"M d, Y" }}</small>
+                </div>
+                <div class="card-body">
+                    {% if feedback.rating %}
+                    <div class="mb-2">
+                        <div class="star-display">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= feedback.rating %} <i class="fas fa-star" style="color: #ffd700;">
+                                </i>
+                                {% else %}
+                                <i class="far fa-star" style="color: #ddd;"></i>
+                                {% endif %}
+                                {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <h5 class="card-title" style="color: #2c3e50;">{{ feedback.subject }}</h5>
+                    <p class="card-text text-muted">{{ feedback.message|truncatewords:30 }}</p>
+
+                    {% if feedback.order %}
+                    <div class="small text-muted mb-2">
+                        <i class="fas fa-receipt"></i> Order #{{ feedback.order.public_id }}
+                    </div>
+                    {% endif %}
+
+                    {% if feedback.admin_response %}
+                    <div class="alert alert-info mt-3" style="border-radius: 10px;">
+                        <strong><i class="fas fa-reply"></i> Admin Response:</strong>
+                        <p class="mb-0 mt-2">{{ feedback.admin_response }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        {% if feedback.is_resolved %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check"></i> Resolved
+                        </span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-inbox" style="font-size: 4rem; color: #ddd;"></i>
+        <h4 class="mt-3 text-muted">No feedback yet</h4>
+        <p class="text-muted">Share your thoughts with us!</p>
+        <a href="{% url 'feedback_form' %}" class="btn btn-primary mt-3" style="border-radius: 50px;">
+            <i class="fas fa-plus me-2"></i> Give Feedback
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

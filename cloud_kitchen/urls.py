@@ -12,6 +12,7 @@ urlpatterns = [
     path('referrals/', include('referrals.urls')),
     path('analytics/', include('analytics.urls')),
     path('locations/', include('locations.urls')),
+    path('feedback/', include('feedback.urls')),
 ]
 
 if settings.DEBUG:

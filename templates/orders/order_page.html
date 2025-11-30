@@ -12,6 +12,7 @@
             <div style="background: #f8f9fa; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: #333;">
                 Wallet: ${{ wallet_balance }}
             </div>
+            <a href="{% url 'current_orders' %}" style="text-decoration: none; color: #007bff;">Current Orders</a>
             <a href="{% url 'order_history' %}" style="text-decoration: none; color: #007bff;">History</a>
             <a href="#" onclick="getReferralLink(); return false;" style="text-decoration: none; color: #007bff;">Refer
                 a Friend</a>

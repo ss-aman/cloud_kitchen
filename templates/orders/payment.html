@@ -39,8 +39,35 @@
         </div>
 
         <div style="margin-top: 30px;">
-            <a href="{% url 'order_page' %}" class="btn" style="background: #6c757d;">Back to Menu</a>
+            <button onclick="confirmPayment()" class="btn btn-success" style="margin-right: 10px;">I have made the
+                payment</button>
+            <a href="{% url 'order_page' %}" class="btn" style="background: #6c757d; color: white;">Back to Menu</a>
         </div>
     </div>
 </div>
+
+<script>
+    function confirmPayment() {
+        if (confirm('Are you sure you have completed the payment?')) {
+            fetch('/orders/confirm-payment/{{ order.id }}/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = "{% url 'current_orders' %}";
+                    } else {
+                        alert('Error confirming payment');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error confirming payment');
+                });
+        }
+    }
+</script>
 {% endblock %}
