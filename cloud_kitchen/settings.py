@@ -5,7 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['*']  # Allow all hosts in development
+
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -106,6 +108,14 @@ X_FRAME_OPTIONS = 'DENY'
 
 # CORS
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000').split(',')
+
+# CSRF Trusted Origins (for ngrok and external access)
+NGROK_URL = config('NGROK_URL', default='http://localhost:8000')
+CSRF_TRUSTED_ORIGINS = [
+    # 'https://1128525f91e1.ngrok-free.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 # Celery
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
